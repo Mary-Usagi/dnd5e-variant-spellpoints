@@ -9,7 +9,7 @@ class VSpellPoints {
         RESOURCES: 'resources',
         ENABLED: 'enabled'
     }
-
+    
     static STATUSCHOICES = {
         enabled: "enabled",
         disabled: "disabled",
@@ -143,8 +143,11 @@ class VSpellPointsData {
         VSpellPoints.log(actorResources)
 
         let isNotPresent = !actorResources || (actorResources && foundry.utils.isObjectEmpty(actorResources))
+        
+        let actor_classes = actor.classes; 
+        if (!actor_classes) actor_classes = actor.data.data.classes;
 
-        let [points, level] = VSpellPointsCalcs.getMaxSpellPointsAndLevel(actor.data.data.classes)
+        let [points, level] = VSpellPointsCalcs.getMaxSpellPointsAndLevel(actor_classes)
 
         /** @type Resource */
         let updateResources;
@@ -228,13 +231,15 @@ class VSpellPointsData {
 
     // check if actor is spellcasters
     static isSpellcaster(actor) {
-        let classes = actor?.data?.data?.classes;
-        if (!classes) {
+        let actor_classes = actor?.classes; 
+        if (!actor_classes) actor_classes = actor?.data?.data?.classes;
+
+        if (!actor_classes) {
             VSpellPoints.log("Actor doesn't have a class")
             return false;
         }
 
-        let isCaster = VSpellPointsCalcs.getCombinedSpellCastingLevel(classes)[0] > 0;
+        let isCaster = VSpellPointsCalcs.getCombinedSpellCastingLevel(actor_classes)[0] > 0;
         if (!isCaster) {
             VSpellPoints.log("Actor is not a spellcaster")
             return false
@@ -244,11 +249,14 @@ class VSpellPointsData {
 
     // check if actor is warlock
     static isWarlock(actor) {
-        if (!(actor?.data?.data?.classes)) {
+        let actor_classes = actor?.classes; 
+        if (!actor_classes) actor_classes = actor?.data?.data?.classes; 
+
+        if (!(actor_classes)) {
             return false
         }
 
-        if ('warlock' in actor.data.data.classes) {
+        if ('warlock' in actor_classes) {
             VSpellPoints.log("Actor is a Warlock")
             return true;
         }
@@ -348,7 +356,12 @@ class VSpellPointsCalcs {
     static getCombinedSpellCastingLevel (classes) {
         let allCastingLevels = {}
         Object.entries(classes).forEach( ([className, classProps]) =>  {
-            allCastingLevels[className.capitalize()] = this.getSpellCastingLevel(classProps.spellcasting.progression, classProps.levels);
+            let class_levels = classProps.levels;
+            if (!class_levels) class_levels = classProps.data.data.levels;
+
+            let class_progression = classProps.spellcasting?.progression;
+            if (!class_progression) class_progression = classProps.data?.data?.spellcasting?.progression;
+            allCastingLevels[className.capitalize()] = this.getSpellCastingLevel(class_progression, class_levels);
         });
         return [Object.values(allCastingLevels).reduce((a, b) => a + b, 0), allCastingLevels];
     }
@@ -411,8 +424,10 @@ class VSpellPointsCalcs {
 
         let tempMax = userData.points.addMax > 0 ? userData.points.addMax : "";
         let tempPoints = userData.points.temp > 0 ? userData.points.temp : "";
+        let actor_classes = actor.classes 
+        if (!actor_classes) actor_classes = actor.data.data.classes
 
-        let [combinedLevel, allCastingLevels] = VSpellPointsCalcs.getCombinedSpellCastingLevel(actor.data.data.classes)
+        let [combinedLevel, allCastingLevels] = VSpellPointsCalcs.getCombinedSpellCastingLevel(actor_classes)
 
         // TODO: with localization
         const template_data =  {
@@ -515,7 +530,6 @@ Hooks.once('ready', () => {
         items.unshift(spellPointsButton);
     })
 
-
     // modify actorsheet after its rendered to show the spell points
     Hooks.on("renderActorSheet5e", (actorsheet, html, _options) => {
         VSpellPoints.log("Add spellpoint UI")
@@ -537,9 +551,12 @@ Hooks.once('ready', () => {
         // removes non spellcasters and single-class warlocks
         VSpellPoints.log("Render Sheet: warlock, spellcaster:", VSpellPointsData.isWarlock(actor), VSpellPointsData.isSpellcaster(actor))
         if (!VSpellPointsData.isSpellcaster(actor)) return;
+        
+        let actor_classes = actor.classes; 
+        if (!actor_classes) actor_classes = actor.data.data.classes; 
 
         // change header of sheet
-        VSpellPoints.log("It's a caster! - Level " + VSpellPointsCalcs.getCombinedSpellCastingLevel(actor.data.data.classes)[0])
+        VSpellPoints.log("It's a caster! - Level " + VSpellPointsCalcs.getCombinedSpellCastingLevel(actor_classes)[0])
         let attributesList = html.find(".sheet-header").find(".attributes")
         let resourcesList = html.find(".sheet-body .center-pane").find("ul.attributes")
         if (resourcesList.length === 0) {

@@ -7,7 +7,7 @@
     "flags": {},
     "version": "WILL BE AUTO REPLACED",
     "minimumCoreVersion": "0.8.8",
-    "compatibleCoreVersion": "0.8.9",
+    "compatibleCoreVersion": "9",
     "scripts": [
         "scripts/main.js"
     ],
