@@ -1,13 +1,19 @@
 {
-    "name": "spellpoints5e",
+    "id": "spellpoints5e",
     "title": "Spell Points for dnd5e",
-    "description": "(Only for dnd5e) Replaces spell slots on the player sheets with the spell points variant defined in the Dungeon Master's Guide. ",
-    "author": "Mary Usagi",
+    "description": "(Only for dnd5e) Replaces spell slots on the player sheets with the spell points variant defined in the Dungeon Master's Guide.",
+    "authors": [
+        {
+            "name": "Mary Usagi",
+            "flags": {}
+        }
+    ],
     "url": "WILL BE AUTO REPLACED",
-    "flags": {},
     "version": "WILL BE AUTO REPLACED",
-    "minimumCoreVersion": "0.8.8",
-    "compatibleCoreVersion": "9",
+    "compatibility": {
+        "minimum": "0.8.8",
+        "verified": "10"
+    },
     "scripts": [
         "scripts/main.js"
     ],
@@ -18,16 +24,20 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "lang/en.json"
+            "path": "lang/en.json",
+            "flags": {}
         }
     ],
-    "packs": [],
-    "system": ["dnd5e"],
-    "dependencies": [],
+    "relationships": {
+        "systems": [
+            {
+                "id": "dnd5e",
+                "type": "system",
+                "compatibility": {}
+            }
+        ]
+    },
     "socket": true,
     "manifest": "WILL BE AUTO REPLACED",
-    "download": "WILL BE AUTO REPLACED",
-    "protected": false,
-    "coreTranslation": false,
-    "library": false
+    "download": "WILL BE AUTO REPLACED"
 }
